@@ -215,7 +215,6 @@ function Install-Or-Upgrade-Node20 {
     $upgradeResult = Invoke-LoggedCommand -FilePath $wingetPath -Arguments @(
         "upgrade",
         "--id", "OpenJS.NodeJS",
-        "--version", "20.20.1",
         "--exact",
         "--accept-source-agreements",
         "--accept-package-agreements",
