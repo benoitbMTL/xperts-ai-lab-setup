@@ -33,24 +33,94 @@ function Write-Step {
     Add-Content -Path $Script:LogFile -Value "=== $Message ==="
 }
 
+function New-EdgeId {
+    param([ref]$Counter)
+    $Counter.Value++
+    return [string]$Counter.Value
+}
+
+function New-EdgeDateAdded {
+    $epoch = [datetime]::SpecifyKind([datetime]"1601-01-01T00:00:00Z", [System.DateTimeKind]::Utc)
+    $now = [datetime]::UtcNow
+    $microseconds = [int64](($now - $epoch).TotalMilliseconds * 1000)
+    return [string]$microseconds
+}
+
+function New-EmptyBookmarksFile {
+    param([string]$Path)
+
+    Write-Log "Creating new Edge Bookmarks file at: $Path" "WARN"
+
+    $parent = Split-Path -Path $Path -Parent
+    if (-not (Test-Path -LiteralPath $parent)) {
+        New-Item -ItemType Directory -Path $parent -Force | Out-Null
+    }
+
+    $now = New-EdgeDateAdded
+
+    $emptyStructure = [ordered]@{
+        checksum = ""
+        roots = [ordered]@{
+            bookmark_bar = [ordered]@{
+                children      = @()
+                date_added    = $now
+                date_last_used = "0"
+                date_modified = $now
+                guid          = [guid]::NewGuid().ToString()
+                id            = "1"
+                name          = "Favorites bar"
+                type          = "folder"
+            }
+            other = [ordered]@{
+                children      = @()
+                date_added    = $now
+                date_last_used = "0"
+                date_modified = $now
+                guid          = [guid]::NewGuid().ToString()
+                id            = "2"
+                name          = "Other favorites"
+                type          = "folder"
+            }
+            synced = [ordered]@{
+                children      = @()
+                date_added    = $now
+                date_last_used = "0"
+                date_modified = $now
+                guid          = [guid]::NewGuid().ToString()
+                id            = "3"
+                name          = "Mobile bookmarks"
+                type          = "folder"
+            }
+        }
+        version = 1
+    }
+
+    $emptyStructure | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $Path -Encoding UTF8
+
+    Write-Log "Empty bookmarks file created."
+}
+
 function Get-EdgeBookmarksFile {
     $userDataRoot = Join-Path $env:LOCALAPPDATA "Microsoft\Edge\User Data"
     Write-Log "Looking for Edge profiles in: $userDataRoot"
 
-    if (-not (Test-Path $userDataRoot)) {
+    if (-not (Test-Path -LiteralPath $userDataRoot)) {
         throw "Edge user data directory not found: $userDataRoot"
     }
 
     $candidateFiles = @()
-
     $defaultBookmarks = Join-Path $userDataRoot "Default\Bookmarks"
-    if (Test-Path $defaultBookmarks) {
+
+    if (Test-Path -LiteralPath $defaultBookmarks) {
         $candidateFiles += $defaultBookmarks
     }
 
-    Get-ChildItem -Path $userDataRoot -Directory -ErrorAction SilentlyContinue | ForEach-Object {
-        $candidate = Join-Path $_.FullName "Bookmarks"
-        if (Test-Path $candidate) {
+    $profileDirs = Get-ChildItem -LiteralPath $userDataRoot -Directory -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -like 'Profile *' }
+
+    foreach ($dir in $profileDirs) {
+        $candidate = Join-Path $dir.FullName "Bookmarks"
+        if (Test-Path -LiteralPath $candidate) {
             $candidateFiles += $candidate
         }
     }
@@ -58,7 +128,9 @@ function Get-EdgeBookmarksFile {
     $candidateFiles = $candidateFiles | Select-Object -Unique
 
     if (-not $candidateFiles -or $candidateFiles.Count -eq 0) {
-        throw "No Edge Bookmarks file found under: $userDataRoot"
+        Write-Log "No Edge Bookmarks file found. Creating one in Default profile." "WARN"
+        New-EmptyBookmarksFile -Path $defaultBookmarks
+        return $defaultBookmarks
     }
 
     Write-Log "Detected bookmark files:"
@@ -72,32 +144,29 @@ function Get-EdgeBookmarksFile {
     }
 
     Write-Log "Using first detected profile bookmarks file."
-    return $candidateFiles[0]
+    return ($candidateFiles | Select-Object -First 1)
 }
 
 function Ensure-EdgeClosed {
     Write-Step "Checking Microsoft Edge process"
 
     $edgeProcesses = Get-Process msedge -ErrorAction SilentlyContinue
+
     if ($edgeProcesses) {
-        Write-Log "Microsoft Edge is currently running." "WARN"
-        throw "Please close Microsoft Edge before running this script."
+        Write-Log "Microsoft Edge is running. Attempting to stop it..." "WARN"
+
+        try {
+            $edgeProcesses | Stop-Process -Force -ErrorAction Stop
+            Start-Sleep -Seconds 2
+            Write-Log "Microsoft Edge processes terminated successfully."
+        }
+        catch {
+            throw "Failed to stop Microsoft Edge processes: $($_.Exception.Message)"
+        }
     }
-
-    Write-Log "Microsoft Edge is not running."
-}
-
-function New-EdgeId {
-    param([ref]$Counter)
-    $Counter.Value++
-    return [string]$Counter.Value
-}
-
-function New-EdgeDateAdded {
-    $epoch = [datetime]::SpecifyKind([datetime]"1601-01-01T00:00:00Z", [System.DateTimeKind]::Utc)
-    $now = [datetime]::UtcNow
-    $microseconds = [int64](($now - $epoch).TotalMilliseconds * 1000)
-    return [string]$microseconds
+    else {
+        Write-Log "Microsoft Edge is not running."
+    }
 }
 
 function Update-MaxId {
@@ -122,16 +191,16 @@ try {
     Write-Log "Script started."
 
     $bookmarksToAdd = @(
-        @{ name = "XPERTS Hands-on-Labs";      url = "https://canada.amerintlxperts.com/hands-on-labs.html" }
-        @{ name = "FortiWeb Admin";            url = "http://fwb-xperts.labsec.ca:8080" }
-        @{ name = "Demo Tool";                 url = "http://demotool-xperts.labsec.ca:8080" }
-        @{ name = "DVWA";                      url = "http://dvwa-xperts.labsec.ca" }
-        @{ name = "Banking Application";       url = "http://bank-xperts.labsec.ca" }
-        @{ name = "MCP Server";                url = "http://mcp-xperts.labsec.ca" }
-        @{ name = "Juiceshop";                 url = "http://juiceshop-xperts.labsec.ca" }
-        @{ name = "Petstore";                  url = "http://petstore3-xperts.labsec.ca" }
-        @{ name = "Speedtest";                 url = "http://speedtest-xperts.labsec.ca" }
-        @{ name = "CSP Server";                url = "http://csp-xperts.labsec.ca" }
+        @{ name = "XPERTS Hands-on-Labs"; url = "https://canada.amerintlxperts.com/hands-on-labs.html" }
+        @{ name = "FortiWeb Admin";       url = "https://fwb-xperts.labsec.ca:8443" }
+        @{ name = "Demo Tool";            url = "http://demotool-xperts.labsec.ca:8080" }
+        @{ name = "DVWA";                 url = "http://dvwa-xperts.labsec.ca" }
+        @{ name = "Banking Application";  url = "http://bank-xperts.labsec.ca" }
+        @{ name = "MCP Server";           url = "http://mcp-xperts.labsec.ca" }
+        @{ name = "Juiceshop";            url = "http://juiceshop-xperts.labsec.ca" }
+        @{ name = "Petstore";             url = "http://petstore3-xperts.labsec.ca" }
+        @{ name = "Speedtest";            url = "http://speedtest-xperts.labsec.ca" }
+        @{ name = "CSP Server";           url = "http://csp-xperts.labsec.ca" }
     )
 
     Ensure-EdgeClosed
@@ -157,6 +226,10 @@ try {
     }
 
     $bookmarkBar = $json.roots.bookmark_bar
+
+    if (-not $bookmarkBar.children) {
+        $bookmarkBar | Add-Member -NotePropertyName children -NotePropertyValue @() -Force
+    }
 
     Write-Step "Scanning existing bookmark IDs"
     $script:MaxId = 0
@@ -193,6 +266,9 @@ try {
         Write-Log "Created folder '$FolderName' on the favorites bar."
     }
     else {
+        if (-not $targetFolder.children) {
+            $targetFolder | Add-Member -NotePropertyName children -NotePropertyValue @() -Force
+        }
         Write-Log "Folder '$FolderName' already exists on the favorites bar."
     }
 

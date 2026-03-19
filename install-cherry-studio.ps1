@@ -82,10 +82,10 @@ function Get-LatestReleaseInfo {
     Write-Log "Asset download URL: $($asset.browser_download_url)"
 
     return [PSCustomObject]@{
-        TagName         = $release.tag_name
-        AssetName       = $asset.name
-        DownloadUrl     = $asset.browser_download_url
-        PublishedAt     = $release.published_at
+        TagName     = $release.tag_name
+        AssetName   = $asset.name
+        DownloadUrl = $asset.browser_download_url
+        PublishedAt = $release.published_at
     }
 }
 
@@ -101,12 +101,13 @@ function Download-Installer {
     Write-Log "Downloading to: $downloadPath"
 
     Invoke-WebRequest -Uri $Url -OutFile $downloadPath -UseBasicParsing
+    Unblock-File -LiteralPath $downloadPath -ErrorAction SilentlyContinue
 
-    if (-not (Test-Path $downloadPath)) {
+    if (-not (Test-Path -LiteralPath $downloadPath)) {
         throw "Download failed. File not found after download: $downloadPath"
     }
 
-    $fileInfo = Get-Item $downloadPath
+    $fileInfo = Get-Item -LiteralPath $downloadPath
     Write-Log "Downloaded file size: $($fileInfo.Length) bytes"
 
     return $downloadPath
@@ -120,17 +121,36 @@ function Install-CherryStudio {
     Write-Step "Running Cherry Studio installer"
 
     Write-Log "Installer path: $InstallerPath"
-    Write-Log "Starting silent installation using /S"
+    Write-Log "Starting silent installation using direct execution: /S"
 
-    $process = Start-Process -FilePath $InstallerPath `
-                             -ArgumentList @("/S") `
-                             -Wait `
-                             -PassThru
+    if (-not (Test-Path -LiteralPath $InstallerPath)) {
+        throw "Installer not found: $InstallerPath"
+    }
 
-    Write-Log "Installer exit code: $($process.ExitCode)"
+    try {
+        Unblock-File -LiteralPath $InstallerPath -ErrorAction SilentlyContinue
+    }
+    catch {
+        Write-Log "Could not unblock installer, continuing anyway." "WARN"
+    }
 
-    if ($process.ExitCode -ne 0) {
-        throw "Cherry Studio installer failed with exit code $($process.ExitCode)."
+    Push-Location (Split-Path -Path $InstallerPath -Parent)
+    try {
+        & $InstallerPath /S
+        $exitCode = $LASTEXITCODE
+    }
+    finally {
+        Pop-Location
+    }
+
+    if ($null -eq $exitCode) {
+        $exitCode = 0
+    }
+
+    Write-Log "Installer exit code: $exitCode"
+
+    if ($exitCode -ne 0) {
+        throw "Cherry Studio installer failed with exit code $exitCode."
     }
 }
 
@@ -148,7 +168,7 @@ function Get-CherryExecutable {
     $candidates = Get-CherryInstallCandidates
 
     foreach ($path in $candidates) {
-        if ($path -and (Test-Path $path)) {
+        if ($path -and (Test-Path -LiteralPath $path)) {
             return $path
         }
     }
@@ -159,12 +179,25 @@ function Get-CherryExecutable {
 function Validate-Install {
     Write-Step "Validating installation"
 
-    $exePath = Get-CherryExecutable
+    $maxAttempts = 15
+    $sleepSeconds = 2
+    $exePath = $null
+
+    for ($i = 1; $i -le $maxAttempts; $i++) {
+        $exePath = Get-CherryExecutable
+        if ($exePath) {
+            break
+        }
+
+        Write-Log "Cherry Studio executable not found yet. Retry $i/$maxAttempts..." "WARN"
+        Start-Sleep -Seconds $sleepSeconds
+    }
+
     if (-not $exePath) {
         throw "Cherry Studio executable was not found in standard install locations."
     }
 
-    $versionInfo = (Get-Item $exePath).VersionInfo
+    $versionInfo = (Get-Item -LiteralPath $exePath).VersionInfo
     $productVersion = $versionInfo.ProductVersion
     $fileVersion = $versionInfo.FileVersion
 
@@ -191,11 +224,11 @@ function Uninstall-CherryStudio {
     $installDir = Split-Path $exePath -Parent
     $uninstallExe = Join-Path $installDir "Uninstall Cherry Studio.exe"
 
-    if (-not (Test-Path $uninstallExe)) {
+    if (-not (Test-Path -LiteralPath $uninstallExe)) {
         $uninstallExe = Join-Path $installDir "Uninstall.exe"
     }
 
-    if (-not (Test-Path $uninstallExe)) {
+    if (-not (Test-Path -LiteralPath $uninstallExe)) {
         throw "Uninstaller not found in: $installDir"
     }
 
