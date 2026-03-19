@@ -188,17 +188,16 @@ function Get-NpmCmdPath {
     throw "Required command not found: npm.cmd"
 }
 
-function Install-Or-Upgrade-Node20 {
+function Install-Or-Upgrade-NodeLTS {
     Write-Step "Checking winget"
     $wingetPath = Get-WingetPath
     Write-Log "winget is available at: $wingetPath"
 
-    Write-Step "Installing or upgrading Node.js 20 LTS"
+    Write-Step "Installing or upgrading latest Node.js LTS"
 
     $installResult = Invoke-LoggedCommand -FilePath $wingetPath -Arguments @(
         "install",
-        "--id", "OpenJS.NodeJS",
-        "--version", "20.20.1",
+        "--id", "OpenJS.NodeJS.LTS",
         "--exact",
         "--accept-source-agreements",
         "--accept-package-agreements",
@@ -214,8 +213,7 @@ function Install-Or-Upgrade-Node20 {
 
     $upgradeResult = Invoke-LoggedCommand -FilePath $wingetPath -Arguments @(
         "upgrade",
-        "--id", "OpenJS.NodeJS",
-        "--version", "20.20.1",
+        "--id", "OpenJS.NodeJS.LTS",
         "--exact",
         "--accept-source-agreements",
         "--accept-package-agreements",
@@ -227,7 +225,7 @@ function Install-Or-Upgrade-Node20 {
         return
     }
 
-    throw "Node.js 20 installation or upgrade failed."
+    throw "Latest Node.js LTS installation or upgrade failed."
 }
 
 function Get-NodeVersion {
@@ -378,10 +376,10 @@ function Uninstall-HootAndNode {
         Write-Log "Removed Hoot data directory: $hootDataDir"
     }
 
-    Write-Step "Uninstalling Node.js 20"
+    Write-Step "Uninstalling Node.js LTS"
     $wingetUninstall = Invoke-LoggedCommand -FilePath $wingetPath -Arguments @(
         "uninstall",
-        "--id", "OpenJS.NodeJS",
+        "--id", "OpenJS.NodeJS.LTS",
         "--exact",
         "--accept-source-agreements"
     ) -IgnoreExitCode
@@ -404,7 +402,7 @@ try {
     Write-Log "Script started with action: $Action"
 
     if ($Action -eq "install") {
-        Install-Or-Upgrade-Node20
+        Install-Or-Upgrade-NodeLTS
         Refresh-Path
         Install-Hoot
         Refresh-Path
