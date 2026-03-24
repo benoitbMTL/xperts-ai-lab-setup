@@ -1,7 +1,7 @@
 # -----------------------------
 # CONFIG
 # -----------------------------
-$logDir  = 'C:\xpert-ai-setup'
+$logDir  = 'C:\xperts-ai-setup'
 $logFile = Join-Path $logDir 'managed-favorites.log'
 
 # Ensure log directory exists
