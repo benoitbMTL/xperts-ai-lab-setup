@@ -155,13 +155,12 @@ function Install-CherryStudio {
 }
 
 function Get-CherryInstallCandidates {
-    $candidates = @(
+    @(
+        "C:\Users\benoitb\AppData\Local\Programs\Cherry Studio\Cherry Studio.exe",
         (Join-Path $env:LOCALAPPDATA "Programs\Cherry Studio\Cherry Studio.exe"),
         (Join-Path ${env:ProgramFiles} "Cherry Studio\Cherry Studio.exe"),
         (Join-Path ${env:ProgramFiles(x86)} "Cherry Studio\Cherry Studio.exe")
-    )
-
-    return $candidates
+    ) | Where-Object { $_ }
 }
 
 function Get-CherryExecutable {
@@ -179,12 +178,24 @@ function Get-CherryExecutable {
 function Validate-Install {
     Write-Step "Validating installation"
 
-    $maxAttempts = 15
+    $maxAttempts = 60
     $sleepSeconds = 2
     $exePath = $null
 
+    # Laisser un peu de temps à l'installeur silencieux pour terminer réellement
+    Start-Sleep -Seconds 10
+
     for ($i = 1; $i -le $maxAttempts; $i++) {
-        $exePath = Get-CherryExecutable
+        $candidates = Get-CherryInstallCandidates
+
+        foreach ($path in $candidates) {
+            Write-Log "Checking path: $path"
+            if ($path -and (Test-Path -LiteralPath $path)) {
+                $exePath = $path
+                break
+            }
+        }
+
         if ($exePath) {
             break
         }
@@ -194,21 +205,19 @@ function Validate-Install {
     }
 
     if (-not $exePath) {
-        throw "Cherry Studio executable was not found in standard install locations."
+        throw "Cherry Studio executable was not found in expected install locations."
     }
 
     $versionInfo = (Get-Item -LiteralPath $exePath).VersionInfo
-    $productVersion = $versionInfo.ProductVersion
-    $fileVersion = $versionInfo.FileVersion
 
     Write-Log "Cherry Studio executable found at: $exePath"
-    Write-Log "Product version: $productVersion"
-    Write-Log "File version: $fileVersion"
+    Write-Log "Product version: $($versionInfo.ProductVersion)"
+    Write-Log "File version: $($versionInfo.FileVersion)"
 
     Write-Step "Summary"
     Write-Host "Cherry Studio executable : $exePath" -ForegroundColor Green
-    Write-Host "Product version          : $productVersion" -ForegroundColor Green
-    Write-Host "File version             : $fileVersion" -ForegroundColor Green
+    Write-Host "Product version          : $($versionInfo.ProductVersion)" -ForegroundColor Green
+    Write-Host "File version             : $($versionInfo.FileVersion)" -ForegroundColor Green
     Write-Host "Log file                 : $Script:LogFile" -ForegroundColor Green
 }
 
