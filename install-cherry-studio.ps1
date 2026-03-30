@@ -149,11 +149,12 @@ function Install-CherryStudio {
 
     Write-Log "Installer exit code: $exitCode"
 
+    # Ne pas échouer tout de suite.
+    # Certains installateurs retournent 1 alors que l'application est bien déployée.
     if ($exitCode -ne 0) {
-        throw "Cherry Studio installer failed with exit code $exitCode."
+        Write-Log "Installer returned non-zero exit code ($exitCode). Installation will be validated by checking the executable." "WARN"
     }
 }
-
 function Get-CherryInstallCandidates {
     @(
         "C:\Users\benoitb\AppData\Local\Programs\Cherry Studio\Cherry Studio.exe",
@@ -182,19 +183,10 @@ function Validate-Install {
     $sleepSeconds = 2
     $exePath = $null
 
-    # Laisser un peu de temps à l'installeur silencieux pour terminer réellement
     Start-Sleep -Seconds 10
 
     for ($i = 1; $i -le $maxAttempts; $i++) {
-        $candidates = Get-CherryInstallCandidates
-
-        foreach ($path in $candidates) {
-            Write-Log "Checking path: $path"
-            if ($path -and (Test-Path -LiteralPath $path)) {
-                $exePath = $path
-                break
-            }
-        }
+        $exePath = Get-CherryExecutable
 
         if ($exePath) {
             break
