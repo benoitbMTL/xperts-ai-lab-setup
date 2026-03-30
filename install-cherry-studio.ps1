@@ -157,7 +157,6 @@ function Install-CherryStudio {
 }
 function Get-CherryInstallCandidates {
     @(
-        "C:\Users\benoitb\AppData\Local\Programs\Cherry Studio\Cherry Studio.exe",
         (Join-Path $env:LOCALAPPDATA "Programs\Cherry Studio\Cherry Studio.exe"),
         (Join-Path ${env:ProgramFiles} "Cherry Studio\Cherry Studio.exe"),
         (Join-Path ${env:ProgramFiles(x86)} "Cherry Studio\Cherry Studio.exe")
