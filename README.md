@@ -1,191 +1,86 @@
-# XPERTS AI Lab Setup
+# XPERTS AI Lab Setup 🚀
 
-PowerShell automation scripts used to prepare the **XPERTS AI Lab environment**.
+Automation scripts to quickly deploy the **XPERTS AI Lab environment**:
 
-These scripts install required tools and configure the local browser environment for quick access to the lab applications.
-
-All scripts:
-
-* are written in **PowerShell**
-* generate a **log file in the current directory**
-* support **install and uninstall modes** where applicable
-* can be executed **directly from GitHub**
+- Windows 11
+- Ubuntu 22.04.1
+- FortiWeb 8.0.4
 
 ---
 
-# Scripts
+## Windows 🖥️
 
-## 1. install-hoot.ps1
+### Scripts
 
-### Objective
+- `install-hoot.ps1` → Installs Hoot (Node.js + MCP client)
+- `install-cherry-studio.ps1` → Installs Cherry Studio
+- `add-edge-bookmarks.ps1` → Add FortiWeb lab bookmarks (Microsoft Edge)
 
-Installs and configures **Hoot – Postman for MCP Servers**.
+📝 A log file is created in the **current directory** for each execution.
 
-The script performs the following tasks:
+### Run full setup
 
-* installs **Node.js 20 LTS**
-* installs **Hoot**
-* applies the **Windows compatibility patch**
-* validates installation
-* writes an installation log
+```powershell
+mkdir xperts-ai-lab; cd xperts-ai-lab; iwr https://raw.githubusercontent.com/benoitbMTL/xperts-ai-lab-setup/refs/heads/main/install-hoot.ps1 -OutFile install-hoot.ps1; iwr https://raw.githubusercontent.com/benoitbMTL/xperts-ai-lab-setup/refs/heads/main/install-cherry-studio.ps1 -OutFile install-cherry-studio.ps1; iwr https://raw.githubusercontent.com/benoitbMTL/xperts-ai-lab-setup/refs/heads/main/add-edge-bookmarks.ps1 -OutFile add-edge-bookmarks.ps1; ./install-hoot.ps1; ./install-cherry-studio.ps1; ./add-edge-bookmarks.ps1
+````
 
-### Uninstall
+### Individual scripts
 
-Supported.
-
-The script removes:
-
-* Hoot
-* Node.js (installed by the script)
-* local Hoot configuration
-
-### Log
-
-A log file is created in the **current directory**:
-
-```
-hoot-install-YYYYMMDD-HHMMSS.log
-```
-
-or
-
-```
-hoot-uninstall-YYYYMMDD-HHMMSS.log
-```
-
-### Run (Install)
-
-Copy and paste:
-
+#### Install Hoot (MCP client)
 ```powershell
 iwr https://raw.githubusercontent.com/benoitbMTL/xperts-ai-lab-setup/refs/heads/main/install-hoot.ps1 -OutFile install-hoot.ps1; ./install-hoot.ps1
-```
+````
 
-### Run (Uninstall)
-
-```powershell
-iwr https://raw.githubusercontent.com/benoitbMTL/xperts-ai-lab-setup/refs/heads/main/install-hoot.ps1 -OutFile install-hoot.ps1; ./install-hoot.ps1 -Action uninstall
-```
-
----
-
-# 2. install-cherry-studio.ps1
-
-### Objective
-
-Installs **Cherry Studio AI Desktop Client**.
-
-The script:
-
-* downloads the **latest Cherry Studio release**
-* installs it silently
-* validates installation
-* writes a log
-
-### Uninstall
-
-Supported.
-
-The script attempts to run the Cherry Studio uninstaller.
-
-### Log
-
-A log file is written in the **current directory**:
-
-```
-cherry-studio-install-YYYYMMDD-HHMMSS.log
-```
-
-or
-
-```
-cherry-studio-uninstall-YYYYMMDD-HHMMSS.log
-```
-
-### Run (Install)
-
+#### Install Cherry Studio
 ```powershell
 iwr https://raw.githubusercontent.com/benoitbMTL/xperts-ai-lab-setup/refs/heads/main/install-cherry-studio.ps1 -OutFile install-cherry-studio.ps1; ./install-cherry-studio.ps1
 ```
 
-### Run (Uninstall)
-
-```powershell
-iwr https://raw.githubusercontent.com/benoitbMTL/xperts-ai-lab-setup/refs/heads/main/install-cherry-studio.ps1 -OutFile install-cherry-studio.ps1; ./install-cherry-studio.ps1 -Action uninstall
-```
-
----
-
-# 3. add-edge-bookmarks.ps1
-
-### Objective
-
-Adds the **FortiWeb lab bookmarks** to the **Microsoft Edge Favorites Bar**.
-
-The script:
-
-* creates a folder **FortiWeb Labs**
-* adds bookmarks for the lab applications
-* avoids duplicate entries
-* backs up the Edge bookmarks database
-* writes a log file
-
-### Bookmarks Added
-
-```
-XPERTS Hands-on-Labs
-FortiWeb Admin
-Demo Tool
-DVWA
-Banking Application
-MCP Server
-Juiceshop
-Petstore
-Speedtest
-CSP Server
-```
-
-### Uninstall
-
-Not applicable.
-
-The script only **adds bookmarks**.
-
-### Log
-
-A log file is written in the current directory:
-
-```
-edge-bookmarks-YYYYMMDD-HHMMSS.log
-```
-
-### Run
-
+#### Add FortiWeb lab bookmarks (Microsoft Edge)
 ```powershell
 iwr https://raw.githubusercontent.com/benoitbMTL/xperts-ai-lab-setup/refs/heads/main/add-edge-bookmarks.ps1 -OutFile add-edge-bookmarks.ps1; ./add-edge-bookmarks.ps1
 ```
 
 ---
 
-# Run Everything (Full Lab Setup)
+## Ubuntu 🐧
 
-The following command:
+### Script
 
-* creates a dedicated directory
-* downloads all scripts
-* executes them sequentially
+* `setup-ubuntu.sh`
 
-Copy and paste:
+### What it does
 
-```powershell
-mkdir xperts-ai-lab; cd xperts-ai-lab; iwr https://raw.githubusercontent.com/benoitbMTL/xperts-ai-lab-setup/refs/heads/main/install-hoot.ps1 -OutFile install-hoot.ps1; iwr https://raw.githubusercontent.com/benoitbMTL/xperts-ai-lab-setup/refs/heads/main/install-cherry-studio.ps1 -OutFile install-cherry-studio.ps1; iwr https://raw.githubusercontent.com/benoitbMTL/xperts-ai-lab-setup/refs/heads/main/add-edge-bookmarks.ps1 -OutFile add-edge-bookmarks.ps1; ./install-hoot.ps1; ./install-cherry-studio.ps1; ./add-edge-bookmarks.ps1
+* validates Ubuntu system
+* installs required packages
+* installs Docker if missing
+* ensures Docker is running
+* deploys lab containers
+* skips already running containers
+* starts existing stopped containers
+
+### Run (install)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/benoitbMTL/xperts-ai-lab-setup/refs/heads/main/setup-ubuntu.sh -o setup-ubuntu.sh && chmod +x setup-ubuntu.sh && sudo ./setup-ubuntu.sh
+```
+
+### Run (uninstall)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/benoitbMTL/xperts-ai-lab-setup/refs/heads/main/setup-ubuntu.sh -o setup-ubuntu.sh && chmod +x setup-ubuntu.sh && sudo ./setup-ubuntu.sh uninstall
 ```
 
 ---
 
-# Requirements
+## FortiWeb 🛡️
 
-* Windows 10 / Windows 11
-* PowerShell
-* Internet access
-* Administrator privileges (recommended)
+### Config file
+
+* `fwb_system.conf`
+
+### Setup
+
+1. Connect to FortiWeb via SSH
+2. Open CLI
+3. Paste the content of `fwb_system.conf`
