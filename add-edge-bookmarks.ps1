@@ -196,7 +196,7 @@ try {
         @{ name = "Demo Tool";            url = "http://demotool-xperts.labsec.ca:8080" }
         @{ name = "DVWA";                 url = "http://dvwa-xperts.labsec.ca" }
         @{ name = "Banking Application";  url = "http://bank-xperts.labsec.ca" }
-        @{ name = "MCP Server";           url = "http://mcp-xperts.labsec.ca" }
+        @{ name = "MCP Server";           url = "http://mcp-xperts.labsec.ca/mcp" }
         @{ name = "Juiceshop";            url = "http://juiceshop-xperts.labsec.ca" }
         @{ name = "Petstore";             url = "http://petstore3-xperts.labsec.ca" }
         @{ name = "Speedtest";            url = "http://speedtest-xperts.labsec.ca" }
