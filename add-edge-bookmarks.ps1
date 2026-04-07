@@ -190,17 +190,26 @@ try {
     New-Item -ItemType File -Path $Script:LogFile -Force | Out-Null
     Write-Log "Script started."
 
+    $separatorConsoles = "---Consoles---"
+    $separatorApps = "-----Apps-----"
+
+    if ($separatorConsoles.Length -ne $separatorApps.Length) {
+        throw "Separator length mismatch: '$separatorConsoles' ($($separatorConsoles.Length)) vs '$separatorApps' ($($separatorApps.Length))"
+    }
+
     $bookmarksToAdd = @(
-        @{ name = "XPERTS Hands-on-Labs"; url = "https://canada.amerintlxperts.com/hands-on-labs.html" }
-        @{ name = "FortiWeb Admin";       url = "https://fwb-xperts.labsec.ca:8443" }
-        @{ name = "Demo Tool";            url = "http://demotool-xperts.labsec.ca:8080" }
-        @{ name = "DVWA";                 url = "http://dvwa-xperts.labsec.ca" }
-        @{ name = "Banking Application";  url = "http://bank-xperts.labsec.ca" }
-        @{ name = "MCP Server";           url = "http://mcp-xperts.labsec.ca/mcp" }
-        @{ name = "Juiceshop";            url = "http://juiceshop-xperts.labsec.ca" }
-        @{ name = "Petstore";             url = "http://petstore3-xperts.labsec.ca" }
-        @{ name = "Speedtest";            url = "http://speedtest-xperts.labsec.ca" }
-        @{ name = "CSP Server";           url = "http://csp-xperts.labsec.ca" }
+        @{ type = "url";       name = "XPERTS Hands-on-Labs"; url = "https://canada.amerintlxperts.com/hands-on-labs.html" }
+        @{ type = "separator"; name = $separatorConsoles;      url = "about:blank#separator-consoles" }
+        @{ type = "url";       name = "FortiWeb Admin";       url = "https://fwb-xperts.labsec.ca:8443" }
+        @{ type = "url";       name = "FortiWeb Demo Tool";   url = "http://demotool-xperts.labsec.ca:8080" }
+        @{ type = "url";       name = "MCP Demo Tool";        url = "http://demotool-xperts.labsec.ca:7001" }
+        @{ type = "separator"; name = $separatorApps;          url = "about:blank#separator-apps" }
+        @{ type = "url";       name = "DVWA";                 url = "http://dvwa-xperts.labsec.ca" }
+        @{ type = "url";       name = "Banking Application";  url = "http://bank-xperts.labsec.ca/bank.html" }
+        @{ type = "url";       name = "MCP Server";           url = "http://mcp-xperts.labsec.ca/mcp" }
+        @{ type = "url";       name = "Juiceshop";            url = "http://juiceshop-xperts.labsec.ca" }
+        @{ type = "url";       name = "Petstore";             url = "http://petstore3-xperts.labsec.ca" }
+        @{ type = "url";       name = "Speedtest";            url = "http://speedtest-xperts.labsec.ca" }
     )
 
     Ensure-EdgeClosed
@@ -274,9 +283,14 @@ try {
 
     Write-Step "Adding bookmarks"
     $existingUrls = @{}
+    $existingSeparatorNames = @{}
     foreach ($child in $targetFolder.children) {
         if ($child.type -eq "url" -and $child.url) {
             $existingUrls[$child.url] = $true
+
+            if ($child.name -and ($child.url -like "about:blank#separator-*")) {
+                $existingSeparatorNames[$child.name] = $true
+            }
         }
     }
 
@@ -284,10 +298,27 @@ try {
     $skippedCount = 0
 
     foreach ($bm in $bookmarksToAdd) {
-        if ($existingUrls.ContainsKey($bm.url)) {
-            Write-Log "Skipping existing bookmark: $($bm.name) -> $($bm.url)"
-            $skippedCount++
-            continue
+        $entryType = "url"
+        if ($bm.ContainsKey("type") -and $bm.type) {
+            $entryType = [string]$bm.type
+        }
+
+        if ($entryType -eq "separator") {
+            if ($existingSeparatorNames.ContainsKey($bm.name)) {
+                Write-Log "Skipping existing separator: $($bm.name)"
+                $skippedCount++
+                continue
+            }
+        }
+        elseif ($entryType -eq "url") {
+            if ($existingUrls.ContainsKey($bm.url)) {
+                Write-Log "Skipping existing bookmark: $($bm.name) -> $($bm.url)"
+                $skippedCount++
+                continue
+            }
+        }
+        else {
+            throw "Unsupported bookmark type: $entryType"
         }
 
         $newBookmark = [pscustomobject]@{
@@ -301,7 +332,14 @@ try {
         }
 
         $targetFolder.children += $newBookmark
-        Write-Log "Added bookmark: $($bm.name) -> $($bm.url)"
+        if ($entryType -eq "separator") {
+            Write-Log "Added separator: $($bm.name)"
+            $existingSeparatorNames[$bm.name] = $true
+        }
+        else {
+            Write-Log "Added bookmark: $($bm.name) -> $($bm.url)"
+            $existingUrls[$bm.url] = $true
+        }
         $addedCount++
     }
 

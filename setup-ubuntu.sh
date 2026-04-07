@@ -19,7 +19,7 @@ CONTAINERS=(
   "juice-shop|3000:3000|bkimminich/juice-shop|"
   "petstore3|4000:8080|swaggerapi/petstore3|"
   "speedtest|5000:80|adolfintel/speedtest|"
-  "mcp-demo|7000:7000|benoitbmtl/mcp-demo|"
+  "mcp-demo|7000:7000|benoitbmtl/mcp-demo|-p 7001:7001"
   "darwin2|8080:8080|benoitbmtl/darwin2|"
 )
 
@@ -340,7 +340,8 @@ print_summary_install() {
     echo "  http://${ip}:3000  -> Juice Shop" | tee -a "$LOG_FILE"
     echo "  http://${ip}:4000  -> Petstore3" | tee -a "$LOG_FILE"
     echo "  http://${ip}:5000  -> Speedtest" | tee -a "$LOG_FILE"
-    echo "  http://${ip}:7000  -> MCP Demo" | tee -a "$LOG_FILE"
+    echo "  http://${ip}:7000  -> MCP Demo (MCP Server)" | tee -a "$LOG_FILE"
+    echo "  http://${ip}:7001  -> MCP Demo (Web UI)" | tee -a "$LOG_FILE"
     echo "  http://${ip}:8080  -> Darwin2" | tee -a "$LOG_FILE"
   else
     echo "  Unable to determine primary IP address." | tee -a "$LOG_FILE"

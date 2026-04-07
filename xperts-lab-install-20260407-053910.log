@@ -1,0 +1,163 @@
+[2026-04-07 05:39:10] [INFO] Script started with action: install
+
+=== Validating operating system ===
+[2026-04-07 05:39:10] [INFO] Detected Ubuntu: Ubuntu 24.04.4 LTS
+
+=== Updating apt package index ===
+[2026-04-07 05:39:10] [INFO] Running: apt-get update
+Hit:1 http://azure.archive.ubuntu.com/ubuntu noble InRelease
+Get:2 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+Get:3 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+Get:4 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+Hit:5 https://deb.nodesource.com/node_20.x nodistro InRelease
+Get:6 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Components [177 kB]
+Get:7 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Components [386 kB]
+Get:8 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Components [212 B]
+Get:9 http://azure.archive.ubuntu.com/ubuntu noble-updates/multiverse amd64 Components [940 B]
+Get:10 http://azure.archive.ubuntu.com/ubuntu noble-backports/main amd64 Components [7364 B]
+Get:11 http://azure.archive.ubuntu.com/ubuntu noble-backports/universe amd64 Components [13.2 kB]
+Get:12 http://azure.archive.ubuntu.com/ubuntu noble-backports/restricted amd64 Components [216 B]
+Get:13 http://azure.archive.ubuntu.com/ubuntu noble-backports/multiverse amd64 Components [212 B]
+Get:14 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Components [21.5 kB]
+Get:15 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Components [74.2 kB]
+Get:16 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted amd64 Components [212 B]
+Get:17 http://azure.archive.ubuntu.com/ubuntu noble-security/multiverse amd64 Components [212 B]
+Fetched 1060 kB in 1s (1484 kB/s)
+Reading package lists...
+
+=== Upgrading installed packages ===
+[2026-04-07 05:39:25] [INFO] Running: env DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
+Reading package lists...
+Building dependency tree...
+Reading state information...
+Calculating upgrade...
+The following packages will be upgraded:
+  fwupd libfwupd2 lshw
+3 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+Need to get 5063 kB of archives.
+After this operation, 0 B of additional disk space will be used.
+Get:1 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 lshw amd64 02.19.git.2021.06.19.996aaad9c7-2ubuntu0.24.04.1 [334 kB]
+Get:2 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libfwupd2 amd64 1.9.34-0ubuntu1~24.04.1 [139 kB]
+Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 fwupd amd64 1.9.34-0ubuntu1~24.04.1 [4590 kB]
+Fetched 5063 kB in 0s (31.6 MB/s)
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 127583 files and directories currently installed.)
+Preparing to unpack .../lshw_02.19.git.2021.06.19.996aaad9c7-2ubuntu0.24.04.1_amd64.deb ...
+Unpacking lshw (02.19.git.2021.06.19.996aaad9c7-2ubuntu0.24.04.1) over (02.19.git.2021.06.19.996aaad9c7-2build3) ...
+Preparing to unpack .../libfwupd2_1.9.34-0ubuntu1~24.04.1_amd64.deb ...
+Unpacking libfwupd2:amd64 (1.9.34-0ubuntu1~24.04.1) over (1.9.33-0ubuntu1~24.04.1ubuntu1) ...
+Preparing to unpack .../fwupd_1.9.34-0ubuntu1~24.04.1_amd64.deb ...
+Unpacking fwupd (1.9.34-0ubuntu1~24.04.1) over (1.9.33-0ubuntu1~24.04.1ubuntu1) ...
+Setting up libfwupd2:amd64 (1.9.34-0ubuntu1~24.04.1) ...
+Setting up lshw (02.19.git.2021.06.19.996aaad9c7-2ubuntu0.24.04.1) ...
+Setting up fwupd (1.9.34-0ubuntu1~24.04.1) ...
+fwupd-offline-update.service is a disabled or a static unit not running, not starting it.
+fwupd-refresh.service is a disabled or a static unit not running, not starting it.
+fwupd.service is a disabled or a static unit not running, not starting it.
+Processing triggers for libc-bin (2.39-0ubuntu8.7) ...
+Processing triggers for man-db (2.12.0-4build2) ...
+Processing triggers for dbus (1.14.10-4ubuntu4.1) ...
+Processing triggers for hicolor-icon-theme (0.17-2) ...
+
+Running kernel seems to be up-to-date.
+
+No services need to be restarted.
+
+No containers need to be restarted.
+
+No user sessions are running outdated binaries.
+
+No VM guests are running outdated hypervisor (qemu) binaries on this host.
+
+=== Installing required packages ===
+[2026-04-07 05:39:40] [INFO] Running: env DEBIAN_FRONTEND=noninteractive apt-get install -y net-tools nmap
+Reading package lists...
+Building dependency tree...
+Reading state information...
+net-tools is already the newest version (2.10-0.1ubuntu4.4).
+nmap is already the newest version (7.94+git20230807.3be01efb1+dfsg-3build2).
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+
+=== Checking Docker installation ===
+[2026-04-07 05:39:41] [INFO] Docker is already installed: Docker version 28.2.2, build 28.2.2-0ubuntu1~24.04.1
+
+=== Ensuring Docker is available ===
+[2026-04-07 05:39:41] [INFO] Docker daemon is already reachable.
+
+=== Validating installed binaries ===
+[2026-04-07 05:39:41] [INFO] Found binary: netstat -> /usr/bin/netstat
+[2026-04-07 05:39:41] [INFO] Found binary: nmap -> /usr/bin/nmap
+[2026-04-07 05:39:41] [INFO] Found binary: docker -> /usr/bin/docker
+
+=== Collecting version information ===
+[2026-04-07 05:39:41] [INFO] Hostname: ubuntu
+[2026-04-07 05:39:41] [INFO] Kernel: 6.17.0-1010-azure
+[2026-04-07 05:39:41] [INFO] Ubuntu: Ubuntu 24.04.4 LTS
+[2026-04-07 05:39:41] [INFO] Docker version: Docker version 28.2.2, build 28.2.2-0ubuntu1~24.04.1
+[2026-04-07 05:39:41] [INFO] Nmap version: Nmap version 7.94SVN ( https://nmap.org )
+
+=== Deploying lab containers ===
+
+=== Processing container: web-dvwa ===
+[2026-04-07 05:39:41] [INFO] Image already present locally: vulnerables/web-dvwa
+[2026-04-07 05:39:41] [INFO] Running: docker run -d --restart unless-stopped --name web-dvwa -p 1000:80 vulnerables/web-dvwa
+632b6c818c6f167e4033f9203c2100c30cb9fdd74fd611391c68e4941b8ff9f7
+[2026-04-07 05:39:44] [INFO] Container 'web-dvwa' created and started successfully.
+
+=== Processing container: demo-web-app ===
+[2026-04-07 05:39:45] [INFO] Image already present locally: benoitbmtl/demo-web-app
+[2026-04-07 05:39:45] [INFO] Running: docker run -d --restart unless-stopped --name demo-web-app -p 2001:80 -e HOST_MACHINE_NAME=ubuntu benoitbmtl/demo-web-app
+50863d27b19591ceaae1937146bc4b6afb438fc01cbe99eaaed05c408261b859
+[2026-04-07 05:39:46] [INFO] Container 'demo-web-app' created and started successfully.
+
+=== Processing container: juice-shop ===
+[2026-04-07 05:39:47] [INFO] Image already present locally: bkimminich/juice-shop
+[2026-04-07 05:39:47] [INFO] Running: docker run -d --restart unless-stopped --name juice-shop -p 3000:3000 bkimminich/juice-shop
+5c30a2e5f6482dccbfb629302cf7905cf0a2daf430a5d499be07d9484dedc2af
+[2026-04-07 05:39:49] [INFO] Container 'juice-shop' created and started successfully.
+
+=== Processing container: petstore3 ===
+[2026-04-07 05:39:49] [INFO] Image already present locally: swaggerapi/petstore3
+[2026-04-07 05:39:49] [INFO] Running: docker run -d --restart unless-stopped --name petstore3 -p 4000:8080 swaggerapi/petstore3
+f00b93bff212915998c3221af589340aeaa28165f423de9499a301a078cbfb64
+[2026-04-07 05:39:50] [INFO] Container 'petstore3' created and started successfully.
+
+=== Processing container: speedtest ===
+[2026-04-07 05:39:50] [INFO] Image already present locally: adolfintel/speedtest
+[2026-04-07 05:39:50] [INFO] Running: docker run -d --restart unless-stopped --name speedtest -p 5000:80 adolfintel/speedtest
+fd6ec9c1e19d2130fa930f085d5fdd63a6d1bca7175a7e9882747c16d0298a4c
+[2026-04-07 05:39:51] [INFO] Container 'speedtest' created and started successfully.
+
+=== Processing container: mcp-demo ===
+[2026-04-07 05:39:51] [INFO] Image already present locally: benoitbmtl/mcp-demo
+[2026-04-07 05:39:51] [INFO] Running: docker run -d --restart unless-stopped --name mcp-demo -p 7000:7000 -p 7001:7001 benoitbmtl/mcp-demo
+7469aade02af0cd814060bd10724ff23168a81d53e7d189a88a6398734c38dd0
+[2026-04-07 05:39:52] [INFO] Container 'mcp-demo' created and started successfully.
+
+=== Processing container: darwin2 ===
+[2026-04-07 05:39:52] [INFO] Image already present locally: benoitbmtl/darwin2
+[2026-04-07 05:39:52] [INFO] Running: docker run -d --restart unless-stopped --name darwin2 -p 8080:8080 benoitbmtl/darwin2
+04e3213ab3f26730b191f0d2b081e3fb71154ee9e658f10e162f0d548f13d867
+[2026-04-07 05:39:53] [INFO] Container 'darwin2' created and started successfully.
+
+=== Validating container status ===
+[2026-04-07 05:39:54] [INFO] Running: web-dvwa | Port: 1000:80 | Image: vulnerables/web-dvwa
+[2026-04-07 05:39:54] [INFO] Running: demo-web-app | Port: 2001:80 | Image: benoitbmtl/demo-web-app
+[2026-04-07 05:39:54] [INFO] Running: juice-shop | Port: 3000:3000 | Image: bkimminich/juice-shop
+[2026-04-07 05:39:54] [INFO] Running: petstore3 | Port: 4000:8080 | Image: swaggerapi/petstore3
+[2026-04-07 05:39:54] [INFO] Running: speedtest | Port: 5000:80 | Image: adolfintel/speedtest
+[2026-04-07 05:39:54] [INFO] Running: mcp-demo | Port: 7000:7000 | Image: benoitbmtl/mcp-demo
+[2026-04-07 05:39:54] [INFO] Running: darwin2 | Port: 8080:8080 | Image: benoitbmtl/darwin2
+
+=== Summary ===
+Log file: /home/benoitb/mcp-demo/xperts-ai-lab-setup/xperts-lab-install-20260407-053910.log
+
+Deployed services:
+  http://10.0.3.4:1000  -> DVWA
+  http://10.0.3.4:2001  -> Demo Web App
+  http://10.0.3.4:3000  -> Juice Shop
+  http://10.0.3.4:4000  -> Petstore3
+  http://10.0.3.4:5000  -> Speedtest
+  http://10.0.3.4:7000  -> MCP Demo (MCP Server)
+  http://10.0.3.4:7001  -> MCP Demo (Web UI)
+  http://10.0.3.4:8080  -> Darwin2
+[2026-04-07 05:39:54] [INFO] Installation completed successfully.
